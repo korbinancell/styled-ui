@@ -87,3 +87,25 @@ state: { selectedDateRange: null }
 </div>
 </DatePickerDemo>
 ```
+
+```react
+showSource: true
+state: { selectedDate: { start: null, end: null } }
+---
+<DatePickerDemo>
+<div>
+<span>The selected day{state.selectedDate.start !== state.selectedDate.end ? `s are ${state.selectedDate.start} to ${state.selectedDate.end}` : ` is ${state.selectedDate.start || 'null'}`}</span>
+	<PopoverManager>
+		<PopoverReference>
+			<Button primary medium onClick={() => setState({ isOpen: !state.isOpen })}>Select Date</Button>
+		</PopoverReference>
+		<Popover isOpen={state.isOpen} placement="bottom">
+			<DayPicker
+				setSelectedDate={dateRange => setState({ selectedDate: dateRange })}
+				selectedDateRange={state.selectedDate}
+			/>
+		</Popover>
+	</PopoverManager>
+</div>
+</DatePickerDemo>
+```

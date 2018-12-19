@@ -27,6 +27,7 @@ import {
 	DatePicker,
 	DatePickerInput,
 	DatePeriodPicker,
+	DayPicker,
 } from '../components/main';
 import { BaseButton } from '../components/button/base-button';
 import { GroupSelector, LargeGroupSelector } from '../components/group-selector';
@@ -539,6 +540,7 @@ const components = [
 					dateFunctions: {
 						...dateFunctions,
 					},
+					DayPicker,
 				},
 			},
 			{

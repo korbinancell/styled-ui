@@ -8,7 +8,7 @@ export { Bootstrap } from './bootstrap';
 export { Button } from './button';
 export { Checkbox } from './check-box';
 export { Collapse } from './collapse';
-export { DatePicker } from './date-picker';
+export { DatePicker, DayPicker } from './date-picker';
 export { DatePickerInput } from './date-picker-input';
 export { DatePeriodPicker } from './date-period-picker';
 export { DropZone } from './drop-zone';

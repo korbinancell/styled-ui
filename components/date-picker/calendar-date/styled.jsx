@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { colors } from '../../shared-styles';
 
-const calendarWeekDayCss = `
+export const calendarWeekDayCss = `
 	flex: 1;
 	position: relative;
 	box-sizing: border-box;
