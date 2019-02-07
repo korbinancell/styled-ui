@@ -56,9 +56,9 @@ export const TransitionPropTypeKeys = [
 	'onExited',
 ];
 
-export const TransitionStatuses = {
+export const TransitionStatuses = Object.freeze({
 	ENTERING: 'entering',
 	ENTERED: 'entered',
 	EXITING: 'exiting',
 	EXITED: 'exited',
-};
+});

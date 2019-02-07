@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import Transition from 'react-transition-group/Transition';
+import { colors, mediaSizes } from '../shared-styles';
 import * as Styled from './styled.jsx';
 
-const ToastStates = Styled.ToastStates;
+const transitionTime = Styled.transitionTime; // milliseconds
+const showTime = { desktop: 5000, mobile: 1000 }; // milliseconds
 
 /**
  * A mobile first Toast. A toast indicates that an action is being taken that does not require the user's
@@ -26,27 +29,38 @@ export class SimpleToast extends PureComponent {
 	};
 
 	static defaultProps = {
-		theme: {},
+		theme: { backgroupColor: colors.white },
 		styleOverrides: {},
 	};
 
 	state = {
-		toastState: ToastStates.hidden,
+		toastHasEntered: false,
+		transitionIn: false,
 		messages: [],
 	};
+
+	_showDuration = null;
+	_showTimeout = null;
+
+	componentDidMount() {
+		if (window) {
+			this._showDuration = window.matchMedia(`(min-width: ${mediaSizes.tablet})`).matches
+				? showTime.desktop
+				: showTime.mobile;
+		}
+	}
 
 	/** Accepts an object with a required `message` and an optional `icon` property */
 	showMessage = newMessage => {
 		if (newMessage.message) {
 			this.setState(prevState => ({
-				toastState:
-					prevState.toastState === ToastStates.showing ? ToastStates.hiding : ToastStates.showing,
+				transitionIn: !prevState.toastHasEntered,
 				messages: [...prevState.messages, newMessage],
 			}));
 		}
 	};
 
-	handleAnimationEnd = () => {
+	/* handleAnimationEnd = () => {
 		const { toastState, messages } = this.state;
 		if (toastState === ToastStates.shown) {
 			this.setState({ toastState: ToastStates.hiding });
@@ -68,22 +82,49 @@ export class SimpleToast extends PureComponent {
 				this.setState({ toastState: ToastStates.hidden, messages: [] });
 			}
 		}
+	}; */
+
+	triggerExit = () => this.setState({ transitionIn: false });
+
+	handleEntered = () => {
+		this.setState({ toastHasEntered: true });
+		this._showTimeout = setTimeout(this.triggerExit, this._showDuration);
+	};
+
+	handleExited = () => {
+		const { messages } = this.state;
+		const newMessages = [...messages];
+		newMessages.shift();
+
+		clearTimeout(this.showTimeout);
+		this.setState({ toastHasEntered: false, transitionIn: newMessages.length > 0 });
 	};
 
 	render() {
 		const { theme, styleOverrides } = this.props;
-		const { messages, toastState } = this.state;
+		const { messages, transitionIn } = this.state;
 
 		return (
-			<Styled.ToastContainer
-				state={toastState}
-				theme={theme}
-				styleOverrides={styleOverrides}
-				onAnimationEnd={this.handleAnimationEnd}
+			<Transition
+				in={transitionIn}
+				timeout={transitionTime}
+				onEntered={this.handleEntered}
+				onExited={this.handleExited}
 			>
-				{messages.length > 0 && messages[0].icon}
-				{messages.length > 0 && <Styled.ToastContent>{messages[0].message}</Styled.ToastContent>}
-			</Styled.ToastContainer>
+				{state => (
+					<Styled.ToastContainer
+						state={state}
+						theme={theme}
+						styleOverrides={styleOverrides}
+						onAnimationEnd={this.handleAnimationEnd}
+					>
+						{messages.length > 0 && messages[0].icon}
+						{messages.length > 0 && (
+							<Styled.ToastContent>{messages[0].message}</Styled.ToastContent>
+						)}
+					</Styled.ToastContainer>
+				)}
+			</Transition>
 		);
 	}
 }

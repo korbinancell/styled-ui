@@ -1,5 +1,6 @@
 import styled, { keyframes, css } from 'styled-components';
-import { fonts, thickness, colors, mediaSizes } from '../shared-styles';
+import { TransitionStatuses } from '../collapse/utils';
+import { fonts, thickness, mediaSizes } from '../shared-styles';
 
 const fixedHeaderHeight = 47; // px
 const fixedHeightOffset = 8; // px
@@ -28,19 +29,6 @@ const fadeOut = keyframes`
 	}
 `;
 
-const showToast = ({ styleOverrides }) => keyframes`
-	0%, 100% {
-		opacity: 1;
-		bottom: ${styleOverrides.bottomOffset || toastOffset.desktop};
-	}
-`;
-
-const showToastMobile = keyframes`
-	0%, 100% {
-		opacity: 1;
-	}
-`;
-
 const fadeInMobile = keyframes`
 	from {
 		opacity: 0;
@@ -56,12 +44,7 @@ const hiddenBottomValue = ({ styleOverrides }) => css`
 	bottom: calc(-1 * (${styleOverrides.height || toastHeight.desktop} + ${toastPadding} * 2));
 `;
 
-export const ToastStates = Object.freeze({
-	hidden: 'hidden',
-	hiding: 'hiding',
-	showing: 'showing',
-	shown: 'shown',
-});
+export const transitionTime = 250; // milliseconds
 
 export const ToastContainer = styled.div`
 	/** Shared Styles */
@@ -76,7 +59,7 @@ export const ToastContainer = styled.div`
 
 	${fonts.ui18};
 
-	background-color: ${({ theme }) => theme.backgroundColor || colors.white};
+	background-color: ${({ theme }) => theme.backgroundColor};
 	border-radius: 3px;
 	box-shadow: 0 19px 38px 0 rgba(0, 0, 0, 0.12), 0 15px 12px 0 rgba(0, 0, 0, 0.12);
 
@@ -99,17 +82,17 @@ export const ToastContainer = styled.div`
 
 	${props => {
 		switch (props.state) {
-			case ToastStates.showing:
+			case TransitionStatuses.ENTERING:
 				return css`
-					animation: ${fadeInMobile} 1s linear;
+					animation: ${fadeInMobile} ${transitionTime}ms linear;
 				`;
-			case ToastStates.hiding:
+			case TransitionStatuses.EXITING:
 				return css`
-					animation: ${fadeOut} 250ms linear;
+					animation: ${fadeOut} ${transitionTime}ms linear;
 				`;
-			case ToastStates.shown:
+			case TransitionStatuses.ENTERED:
 				return css`
-					animation: ${showToastMobile} 1s linear;
+					opacity: 1;
 				`;
 			default:
 				return '';
@@ -133,18 +116,19 @@ export const ToastContainer = styled.div`
 
 		${props => {
 			switch (props.state) {
-				case ToastStates.showing:
+				case TransitionStatuses.ENTERING:
 					return css`
-						animation: ${slideIn(props)} 250ms linear;
+						animation: ${slideIn(props)} ${transitionTime}ms linear;
 					`;
-				case ToastStates.hiding:
+				case TransitionStatuses.EXITING:
 					return css`
-						animation: ${fadeOut} 250ms linear;
+						animation: ${fadeOut} ${transitionTime}ms linear;
 						bottom: ${props.bottomOffset || toastOffset.desktop};
 					`;
-				case ToastStates.shown:
+				case TransitionStatuses.ENTERED:
 					return css`
-						animation: ${showToast(props)} 5s linear;
+						opacity: 1;
+						bottom: ${props.styleOverrides.bottomOffset || toastOffset.desktop};
 					`;
 				default:
 					return '';
