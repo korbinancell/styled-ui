@@ -9,7 +9,7 @@ state: { isOpen: false }
 		<PopoverReference>
 			<Button primary medium onClick={() => setState({ isOpen: !state.isOpen })}>Show a Popover!</Button>
 		</PopoverReference>
-		<Popover isOpen={state.isOpen} placement="top">Hello!</Popover>
+		<Popover isOpen={state.isOpen} placement="top" onFocusAway={() => setState({ isOpen: false })}><Button small>Wat</Button></Popover>
 	</PopoverManager>
 </PopoverDemo>
 ```
